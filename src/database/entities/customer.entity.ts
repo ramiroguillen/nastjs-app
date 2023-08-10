@@ -8,11 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import UserEntity from './user.entity';
-import OrderEntity from './order.entity';
+import { UserEntity } from './user.entity';
+import { OrderEntity } from './order.entity';
 
 @Entity({ name: 'customer' })
-class CustomerEntity {
+export class CustomerEntity {
   @PrimaryGeneratedColumn()
   id!: string;
   @Column()
@@ -31,5 +31,3 @@ class CustomerEntity {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export default CustomerEntity;

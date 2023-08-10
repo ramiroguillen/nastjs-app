@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -12,8 +11,8 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: ['dist/database/entities/*.entity{.ts,.js}'],
       synchronize: false,
+      entities: ['dist/database/entities/*.entity{.ts,.js}'],
       retryDelay: 3000,
       retryAttempts: 10,
     }),

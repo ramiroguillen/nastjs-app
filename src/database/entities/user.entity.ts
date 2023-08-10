@@ -8,11 +8,11 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import CustomerEntity from './customer.entity';
+import { CustomerEntity } from './customer.entity';
 import { UserRoles } from '../../users/types/userRoles.type';
 
 @Entity({ name: 'user' })
-class UserEntity {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id!: string;
   @Column()
@@ -30,5 +30,3 @@ class UserEntity {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export default UserEntity;

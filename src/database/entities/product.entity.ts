@@ -7,10 +7,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import OrderEntity from './order.entity';
+import { OrderEntity } from './order.entity';
 
 @Entity({ name: 'product' })
-class ProductEntity {
+export class ProductEntity {
   @PrimaryGeneratedColumn()
   id!: string;
   @Column()
@@ -35,5 +35,3 @@ class ProductEntity {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export default ProductEntity;

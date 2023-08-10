@@ -8,12 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import CustomerEntity from './customer.entity';
-import ProductEntity from './product.entity';
+import { CustomerEntity } from './customer.entity';
+import { ProductEntity } from './product.entity';
 import { OrderStatus } from '../../orders/types/orderStatus.type';
 
 @Entity({ name: 'order' })
-class OrderEntity {
+export class OrderEntity {
   @PrimaryGeneratedColumn()
   id!: string;
   @ManyToOne(() => CustomerEntity, (customer) => customer.orders)
@@ -34,5 +34,3 @@ class OrderEntity {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
-
-export default OrderEntity;
