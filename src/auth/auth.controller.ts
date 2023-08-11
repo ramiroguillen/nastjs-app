@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { UserDTO } from 'src/users/dto/user.dto';
+import { UserDTO } from 'src/user/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +10,22 @@ export class AuthController {
    * signup
    */
   @Post('signup')
-  public signup(@Body() user: UserDTO) {
-    return this.authService.signup(user);
+  public async signup(
+    @Body() userDto: Partial<UserDTO>,
+  ): Promise<{ access_token: string }> {
+    if (userDto.email && userDto.password) {
+      return await this.authService.signup(userDto);
+    }
+  }
+  /**
+   * signin
+   */
+  @Post('signin')
+  public async signin(
+    @Body() userDto: Partial<UserDTO>,
+  ): Promise<{ access_token: string }> {
+    if (userDto.email && userDto.password) {
+      return await this.authService.signin(userDto);
+    }
   }
 }
