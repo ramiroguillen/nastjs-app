@@ -6,6 +6,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -23,7 +24,7 @@ export class CustomerEntity {
   address!: string;
   @OneToOne(() => UserEntity, (user) => user.customer)
   @JoinColumn({ name: 'user_id' })
-  user!: UserEntity;
+  user!: Relation<UserEntity>;
   @OneToMany(() => OrderEntity, (order) => order.customer)
   orders?: OrderEntity[];
   @CreateDateColumn()

@@ -2,9 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
@@ -23,8 +23,7 @@ export class UserEntity {
   @Column({ type: 'enum', enum: UserRoles, nullable: false })
   role!: UserRoles;
   @OneToOne(() => CustomerEntity, (customer) => customer.user)
-  @JoinColumn({ name: 'customer_id' })
-  customer!: CustomerEntity;
+  customer!: Relation<CustomerEntity>;
   @CreateDateColumn()
   createdAt!: Date;
   @UpdateDateColumn()

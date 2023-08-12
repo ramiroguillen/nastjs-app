@@ -1,69 +1,83 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 import { UserEntity } from 'src/database/entities/user.entity';
-import { UserDTO } from 'src/user/dto/user.dto';
+import { AuthDTO } from 'src/auth/dto/auth.dto';
 import { UserRoles } from 'src/user/types/userRoles.type';
 import { createHash, verifyHash } from 'src/utils/bcrypt';
+import { UserDTO } from 'src/user/dto/user.dto';
+import { CustomerEntity } from 'src/database/entities/customer.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(CustomerEntity)
+    private customerRepository: Repository<CustomerEntity>,
     private jwt: JwtService,
     private config: ConfigService,
   ) {}
   /**
-   * signup
+   * signUp
    */
-  public async signup(
-    userDto: Partial<UserDTO>,
-  ): Promise<{ access_token: string }> {
-    try {
-      const hash = await createHash(userDto.password);
-      const role = UserRoles.USER;
-      const user = this.userRepository.create({
-        email: userDto.email,
-        password: hash,
-        role,
+  public async signUp(authDto: AuthDTO): Promise<{ access_token: string }> {
+    const hash = await createHash(authDto.password);
+    const role = UserRoles.USER;
+    const newUser = this.userRepository.create({
+      email: authDto.email,
+      password: hash,
+      role,
+    });
+    const user = await this.userRepository.save(newUser);
+    if (!user) {
+      throw new ForbiddenException('Something bad happened', {
+        cause: new Error(),
+        description: 'Cannot save new user',
       });
-      await this.userRepository.save(user);
-      return this.signin({
-        email: userDto.email,
-        password: userDto.password,
-      });
-    } catch (error) {
-      throw new ForbiddenException('Credentials taken');
     }
+    const newCustomer = this.customerRepository.create({
+      firstName: authDto.firstName,
+      lastName: authDto.lastName,
+      address: authDto.address,
+      user,
+    });
+    const customer = await this.customerRepository.save(newCustomer);
+    if (!customer) {
+      throw new ForbiddenException('Something bad happened', {
+        cause: new Error(),
+        description: 'Cannot save new customer',
+      });
+    }
+    return this.signIn({
+      email: authDto.email,
+      password: authDto.password,
+    });
   }
   /**
-   * signin
+   * signIn
    */
-  public async signin(
+  public async signIn(
     userDto: Partial<UserDTO>,
   ): Promise<{ access_token: string }> {
-    try {
-      const user = await this.userRepository.findOneBy({
-        email: userDto.email,
-      });
-      if (!user) {
-        throw new ForbiddenException('Invalid credentials');
-      }
-      const passwordsMatches = await verifyHash(
-        userDto.password,
-        user.password,
-      );
-      if (!passwordsMatches) {
-        throw new ForbiddenException('Invalid credentials');
-      }
-      return this.signToken(user.id, user.email, user.role);
-    } catch (error) {
-      throw new Error(error);
+    const user = await this.userRepository.findOneBy({
+      email: userDto.email,
+    });
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
     }
+    const passwordsMatches = await verifyHash(userDto.password, user.password);
+    if (!passwordsMatches) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return this.signToken(user.id, user.email, user.role);
   }
   /**
    * signToken
